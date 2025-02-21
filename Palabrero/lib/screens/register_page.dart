@@ -8,6 +8,7 @@ class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _RegisterPageState createState() => _RegisterPageState();
 }
 
@@ -16,7 +17,6 @@ class _RegisterPageState extends State<RegisterPage> {
   final _dobController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -42,14 +42,17 @@ class _RegisterPageState extends State<RegisterPage> {
       });
 
       // Mostrar mensaje de éxito
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Usuario registrado exitosamente')),
       );
 
       // Redirigir al usuario a la pantalla principal o login
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
     } catch (e) {
       // Manejar errores y mostrar mensaje
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al registrar: $e')),
       );
@@ -115,7 +118,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                           hintText: 'Ingresa tu email',
                           hintStyle: TextStyle(color: Colors.grey[500]),
-                          errorStyle: TextStyle(color: Colors.white),
+                          errorStyle: const TextStyle(color: Colors.white),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -153,7 +156,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           hintText: 'Selecciona tu fecha de nacimiento',
                           hintStyle: TextStyle(color: Colors.grey[500]),
                           suffixIcon: Icon(Icons.calendar_today, color: Colors.grey[500]),
-                          errorStyle: TextStyle(color: Colors.white),
+                          errorStyle: const TextStyle(color: Colors.white),
                         ),
                         readOnly: true,
                         onTap: () async {
@@ -196,7 +199,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                           hintText: 'Ingresa tu usuario',
                           hintStyle: TextStyle(color: Colors.grey[500]),
-                          errorStyle: TextStyle(color: Colors.white),
+                          errorStyle: const TextStyle(color: Colors.white),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -232,16 +235,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           hintText: 'Ingresa tu contraseña',
                           hintStyle: TextStyle(color: Colors.grey[500]),
                           suffixIcon: Icon(Icons.visibility, color: Colors.grey[500]),
-                          errorStyle: TextStyle(color: Colors.white),
+                          errorStyle: const TextStyle(color: Colors.white),
                         ),
-                        validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Por favor ingrese su contraseña';
-                            } else if (!RegExp(r"^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$&.,]).{8,}$").hasMatch(value)) {
-                              return 'Debe contener al menos una mayúscula, un número y un carácter especial';
-                            }
-                            return null;
-                          },
                       ),
 
                       const SizedBox(height: 40.0),

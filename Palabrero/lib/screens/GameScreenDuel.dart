@@ -1,3 +1,4 @@
+// ignore_for_file: file_names
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -164,11 +165,11 @@ class _GameScreenState extends State<GameScreenDuel> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('¡Felicidades!'),
+          title: const Text('¡Felicidades!'),
           content: Text('$winner ha ganado.'),
           actions: <Widget>[
             TextButton(
-              child: Text('Volver a jugar'),
+              child: const Text('Volver a jugar'),
               onPressed: () {
                 Navigator.of(context).pop();
                 if (mounted) {
@@ -177,7 +178,7 @@ class _GameScreenState extends State<GameScreenDuel> {
               },
             ),
             TextButton(
-              child: Text('Volver al dashboard'),
+              child: const Text('Volver al dashboard'),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop(); // Asume que el dashboard es la pantalla anterior
@@ -315,7 +316,6 @@ class _GameScreenState extends State<GameScreenDuel> {
 
   String _getWordInDirection(int row, int col, int rowIncrement, int colIncrement) {
     String word = '';
-    int i = 0;
 
     while (row >= 0 && col >= 0 && row < boardSize && col < boardSize && boardTiles[row * boardSize + col] != null) {
       row -= rowIncrement;
@@ -381,7 +381,7 @@ class _GameScreenState extends State<GameScreenDuel> {
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
         toolbarHeight: 100,
-        backgroundColor: Color.fromARGB(255, 82, 104, 246),
+        backgroundColor: const Color.fromARGB(255, 82, 104, 246),
         automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -458,7 +458,7 @@ class _GameScreenState extends State<GameScreenDuel> {
                   return GestureDetector(
                     onTap: () => _selectWordOnBoard(index),
                     child: DragTarget<String>(
-                      onAccept: (data) => _placeWordOnBoard(index),
+                      onAcceptWithDetails: (data) => _placeWordOnBoard(index),
                       builder: (context, candidateData, rejectedData) {
                         return Container(
                           decoration: BoxDecoration(

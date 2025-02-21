@@ -1,3 +1,4 @@
+// ignore_for_file: file_names
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -192,11 +193,11 @@ class _GameScreenState extends State<GameScreen> {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text('¡Felicidades!'),
+        title: const Text('¡Felicidades!'),
         content: Text('$winner ha ganado.'),
         actions: <Widget>[
           TextButton(
-            child: Text('Volver a jugar'),
+            child: const Text('Volver a jugar'),
             onPressed: () {
               Navigator.of(context).pop();
               if (mounted) {
@@ -205,7 +206,7 @@ class _GameScreenState extends State<GameScreen> {
             },
           ),
           TextButton(
-            child: Text('Volver al dashboard'),
+            child: const Text('Volver al dashboard'),
             onPressed: () {
               Navigator.of(context).pop();
               Navigator.of(context).pop(); // Asume que el dashboard es la pantalla anterior
@@ -280,9 +281,6 @@ class _GameScreenState extends State<GameScreen> {
   int randomPosition = availablePositions[Random().nextInt(availablePositions.length)];
 
   // Verificar si la palabra cabe en la posición seleccionada
-  int row = randomPosition ~/ boardSize;
-  int col = randomPosition % boardSize;
-
   bool canPlaceWord = true;
   for (int i = 0; i < word.length; i++) {
     int index = isHorizontal ? randomPosition + i : randomPosition + (i * boardSize);
@@ -396,7 +394,6 @@ class _GameScreenState extends State<GameScreen> {
 
   String _getWordInDirection(int row, int col, int rowIncrement, int colIncrement) {
     String word = '';
-    int i = 0;
 
     while (row >= 0 && col >= 0 && row < boardSize && col < boardSize && boardTiles[row * boardSize + col] != null) {
       row -= rowIncrement;
