@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _LoginPageState createState() => _LoginPageState();
 }
 
@@ -126,7 +127,7 @@ class _LoginPageState extends State<LoginPage> {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => RegisterPage()),
+                            MaterialPageRoute(builder: (context) => const RegisterPage()),
                           );
                         },
                         child: const Text(
@@ -206,8 +207,9 @@ class _LoginPageState extends State<LoginPage> {
         password: _passwordController.text.trim(),
       );
       Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
         context,
-        MaterialPageRoute(builder: (context) => DashboardPage()),
+        MaterialPageRoute(builder: (context) => const DashboardPage()),
       );
     } on FirebaseAuthException catch (e) {
       String errorMsg = '';
@@ -218,6 +220,7 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         errorMsg = 'Error: ${e.message}';
       }
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMsg)),
       );
@@ -245,11 +248,13 @@ class _LoginPageState extends State<LoginPage> {
 
         await FirebaseAuth.instance.signInWithCredential(credential);
         Navigator.pushReplacement(
+          // ignore: use_build_context_synchronously
           context,
-          MaterialPageRoute(builder: (context) => DashboardPage()),
+          MaterialPageRoute(builder: (context) => const DashboardPage()),
         );
       }
     } on FirebaseAuthException catch (e) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al iniciar sesión con Google: ${e.message}')),
       );

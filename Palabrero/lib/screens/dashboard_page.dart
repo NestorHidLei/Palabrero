@@ -1,7 +1,8 @@
-import 'package:Palabraro/screens/GameScreen.dart';
-import 'package:Palabraro/screens/GameScreenDuel.dart';
+import 'package:Palabraro/screens/game_screen.dart';
+import 'package:Palabraro/screens/game_screen_duel.dart';
 import 'package:Palabraro/screens/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 
@@ -14,11 +15,14 @@ class DashboardPage extends StatelessWidget {
       await FirebaseAuth.instance.signOut();
       // Redirigir al usuario a la página de inicio de sesión
       Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(builder: (context) => const LoginPage()),
       );
     } catch (e) {
-      print("Error al cerrar sesión: $e");
+      if (kDebugMode) {
+        print("Error al cerrar sesión: $e");
+      }
     }
   }
 
@@ -43,7 +47,7 @@ class DashboardPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${user?.displayName ?? 'Invitado'}',
+                    user?.displayName ?? 'Invitado',
                     style: const TextStyle(
                       fontSize: 24,
                       color: Colors.white,
