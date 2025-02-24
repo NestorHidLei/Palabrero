@@ -1,25 +1,27 @@
-import 'package:Palabraro/screens/game_screen.dart';
-import 'package:Palabraro/screens/game_screen_duel.dart';
-import 'package:Palabraro/screens/login_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:Palabraro/screens/game_screen.dart'; // Importa la pantalla del juego en modo solo
+import 'package:Palabraro/screens/game_screen_duel.dart'; // Importa la pantalla del juego en modo duelo
+import 'package:Palabraro/screens/login_page.dart'; // Importa la pantalla de inicio de sesión
+import 'package:firebase_auth/firebase_auth.dart'; // Importa Firebase Authentication para manejar la sesión del usuario
+import 'package:flutter/foundation.dart'; // Proporciona herramientas de depuración
+import 'package:flutter/material.dart'; // Importa el framework UI de Flutter
 
-
+/// Página principal del Dashboard
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
 
-  // Función para cerrar sesión
+  /// Función para cerrar sesión del usuario en Firebase
   Future<void> _signOut(BuildContext context) async {
     try {
-      await FirebaseAuth.instance.signOut();
-      // Redirigir al usuario a la página de inicio de sesión
+      await FirebaseAuth.instance.signOut(); // Cierra la sesión del usuario
+
+      // Redirige al usuario a la página de inicio de sesión
       Navigator.pushReplacement(
         // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(builder: (context) => const LoginPage()),
       );
     } catch (e) {
+      // Imprime el error en la consola si está en modo depuración
       if (kDebugMode) {
         print("Error al cerrar sesión: $e");
       }
@@ -28,26 +30,26 @@ class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = FirebaseAuth.instance.currentUser; // Obtiene el usuario actual autenticado
 
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/background dashboard.png'),
+            image: AssetImage('assets/images/background dashboard.png'), // Imagen de fondo
             fit: BoxFit.cover,
           ),
         ),
         child: Column(
           children: [
-            // Header
+            // Header con el nombre del usuario y el botón de cerrar sesión
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 80.0, vertical: 40.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    user?.displayName ?? 'Invitado',
+                    user?.displayName ?? 'Invitado', // Muestra el nombre del usuario o "Invitado" si no tiene nombre
                     style: const TextStyle(
                       fontSize: 24,
                       color: Colors.white,
@@ -55,7 +57,7 @@ class DashboardPage extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  // Icono de cerrar sesión
+                  // Icono para cerrar sesión
                   GestureDetector(
                     onTap: () => _signOut(context),
                     child: const CircleAvatar(
@@ -72,9 +74,10 @@ class DashboardPage extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            // SOLO Button
+
+            // Botón para jugar en modo SOLO
             Transform.rotate(
-              angle: 0.45,
+              angle: 0.45, // Gira el botón en diagonal
               child: GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -104,9 +107,10 @@ class DashboardPage extends StatelessWidget {
                 ),
               ),
             ),
-            // DUEL Button
+
+            // Botón para jugar en modo DUEL
             Transform.rotate(
-              angle: 0.45,
+              angle: 0.45, // Gira el botón en diagonal
               child: GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -136,16 +140,18 @@ class DashboardPage extends StatelessWidget {
                 ),
               ),
             ),
+
             const Spacer(),
-            // Bienvenida al usuario
+
+            // Mensaje de bienvenida con el correo del usuario
             Text(
-              'Bienvenido, ${user?.email ?? 'No disponible'}',
+              'Bienvenido, ${user?.email ?? 'No disponible'}', // Muestra el correo o "No disponible" si no hay usuario
               style: const TextStyle(
                 fontSize: 18,
                 color: Colors.white,
               ),
             ),
-            const SizedBox(height: 20.0),
+            const SizedBox(height: 20.0), // Espacio adicional al final
           ],
         ),
       ),

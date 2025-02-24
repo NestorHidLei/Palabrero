@@ -1,11 +1,12 @@
-// ignore_for_file: file_names
-import 'dart:convert';
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+// Importaciones necesarias para el funcionamiento del código
+import 'dart:convert'; // Para manejar JSON
+import 'dart:math'; // Para operaciones matemáticas como generar números aleatorios
+import 'package:flutter/material.dart'; // Para la interfaz de usuario de Flutter
+import 'package:http/http.dart' as http; // Para realizar peticiones HTTP
 
+// Clase principal que representa la pantalla del juego
 class GameScreen extends StatefulWidget {
-  final bool isSoloMode;
+  final bool isSoloMode; // Indica si el juego es en modo solitario
 
   const GameScreen({super.key, required this.isSoloMode});
 
@@ -13,54 +14,59 @@ class GameScreen extends StatefulWidget {
   State<GameScreen> createState() => _GameScreenState();
 }
 
+// Estado de la pantalla del juego
 class _GameScreenState extends State<GameScreen> {
-  static const int boardSize = 9;
-  static const int playerTilesCount = 7;
-  int playerScore = 0;
-  int botScore = 0;
+  static const int boardSize = 9; // Tamaño del tablero (9x9)
+  static const int playerTilesCount = 7; // Número de fichas que tiene cada jugador
+  int playerScore = 0; // Puntuación del jugador
+  int botScore = 0; // Puntuación del bot
 
+  // Frecuencia de cada letra en el juego
   final Map<String, int> letterFrequency = {
     'A': 9, 'B': 2, 'C': 2, 'D': 4, 'E': 12, 'F': 2, 'G': 3, 'H': 2, 'I': 9,
     'J': 1, 'K': 1, 'L': 4, 'M': 2, 'N': 6, 'O': 8, 'P': 2, 'Q': 1, 'R': 6,
     'S': 4, 'T': 6, 'U': 4, 'V': 2, 'W': 2, 'X': 1, 'Y': 2, 'Z': 1
   };
 
+  // Puntuación de cada letra en el juego
   final Map<String, int> letterScores = {
     'A': 1, 'B': 3, 'C': 3, 'D': 2, 'E': 1, 'F': 4, 'G': 2, 'H': 4, 'I': 1,
     'J': 8, 'K': 5, 'L': 1, 'M': 3, 'N': 1, 'O': 1, 'P': 3, 'Q': 10, 'R': 1,
     'S': 1, 'T': 1, 'U': 1, 'V': 4, 'W': 4, 'X': 8, 'Y': 4, 'Z': 10
   };
 
-  List<String?> boardTiles = List<String?>.filled(boardSize * boardSize, null);
-  List<String> playerTiles = [];
-  List<String> botTiles = [];
-  List<String> selectedTilesForWord = [];
-  late List<String> letterPool;
-  String? draggableWord;
-  bool isHorizontal = true;
-  String? selectedBoardWord;
-  int? selectedBoardWordStartIndex;
-  bool isPlayerTurn = true;
-  int playerDiscardsRemaining = 3;
+  List<String?> boardTiles = List<String?>.filled(boardSize * boardSize, null); // Estado del tablero
+  List<String> playerTiles = []; // Fichas del jugador
+  List<String> botTiles = []; // Fichas del bot
+  List<String> selectedTilesForWord = []; // Fichas seleccionadas para formar una palabra
+  late List<String> letterPool; // Pool de letras disponibles
+  String? draggableWord; // Palabra que se está arrastrando para colocar en el tablero
+  bool isHorizontal = true; // Dirección de la palabra (horizontal o vertical)
+  String? selectedBoardWord; // Palabra seleccionada en el tablero
+  int? selectedBoardWordStartIndex; // Índice de inicio de la palabra seleccionada
+  bool isPlayerTurn = true; // Indica si es el turno del jugador
+  int playerDiscardsRemaining = 3; // Número de descartes restantes en el turno
 
   @override
   void initState() {
     super.initState();
-    _initializeLetterPool();
-    _generateRandomTiles();
+    _initializeLetterPool(); // Inicializa el pool de letras
+    _generateRandomTiles(); // Genera las fichas iniciales del jugador
     if (!widget.isSoloMode) {
-      _generateBotTiles();
+      _generateBotTiles(); // Genera las fichas iniciales del bot si no es modo solitario
     }
   }
 
+  // Inicializa el pool de letras basado en la frecuencia de cada letra
   void _initializeLetterPool() {
     letterPool = [];
     letterFrequency.forEach((letter, count) {
       letterPool.addAll(List.filled(count, letter));
     });
-    letterPool.shuffle(Random());
+    letterPool.shuffle(Random()); // Mezcla las letras aleatoriamente
   }
 
+  // Genera fichas aleatorias para el jugador
   void _generateRandomTiles() {
     if (letterPool.isNotEmpty) {
       final neededTiles = playerTilesCount - playerTiles.length;
@@ -76,6 +82,7 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  // Genera fichas aleatorias para el bot
   void _generateBotTiles() {
     if (letterPool.isNotEmpty) {
       final neededTiles = playerTilesCount - botTiles.length;
@@ -91,6 +98,7 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  // Obtiene una palabra aleatoria de una API externa
   Future<String?> _getRandomWord() async {
     while (true) {
       final response = await http.get(Uri.parse('https://random-word-api.herokuapp.com/word'));
@@ -99,12 +107,13 @@ class _GameScreenState extends State<GameScreen> {
         List<dynamic> words = jsonDecode(response.body);
         String randomWord = words.first.toUpperCase();
 
-        if (randomWord.length > 5) continue;
+        if (randomWord.length > 5) continue; // Ignora palabras largas
           return randomWord;
       }
     }
   }
 
+  // Valida si una palabra existe usando una API de diccionario
   Future<bool> validateWord(String word) async {
     try {
       final response = await http.get(Uri.parse('https://api.dictionaryapi.dev/api/v2/entries/en/$word'));
@@ -118,106 +127,110 @@ class _GameScreenState extends State<GameScreen> {
     return false;
   }
 
+  // Intenta colocar una palabra en el tablero
   Future<void> tryPlaceWordOnBoard() async {
-  if (selectedTilesForWord.isEmpty) return;
+    if (selectedTilesForWord.isEmpty) return;
 
-  String word = selectedTilesForWord.join();
-  bool isValid = await validateWord(word);
+    String word = selectedTilesForWord.join();
+    bool isValid = await validateWord(word);
 
-  if (isValid && mounted) {
-    setState(() {
-      draggableWord = word;
-    });
-  } else if (mounted) {
-    _returnTilesToPlayer();
-    _showInvalidWordMessage(word);
-  }
-}
-
-  void _placeWordOnBoard(int startIndex) {
-  if (draggableWord == null || !mounted) return;
-
-  int wordLength = draggableWord!.length;
-  int row = startIndex ~/ boardSize;
-  int col = startIndex % boardSize;
-
-  // Verificar si las celdas están vacías
-  for (int i = 0; i < wordLength; i++) {
-    int index = isHorizontal ? startIndex + i : startIndex + (i * boardSize);
-    if (index >= boardSize * boardSize || boardTiles[index] != null) {
-      _showInvalidPlacementMessage();
-      return;
+    if (isValid && mounted) {
+      setState(() {
+        draggableWord = word;
+      });
+    } else if (mounted) {
+      _returnTilesToPlayer();
+      _showInvalidWordMessage(word);
     }
   }
 
-  if (isHorizontal ? col + wordLength > boardSize : row + wordLength > boardSize) {
-    _showInvalidPlacementMessage();
-    return;
-  }
+  // Coloca una palabra en el tablero en una posición específica
+  void _placeWordOnBoard(int startIndex) {
+    if (draggableWord == null || !mounted) return;
 
-  int wordScore = 0;
-  for (int i = 0; i < wordLength; i++) {
-    String letter = draggableWord![i];
-    wordScore += letterScores[letter] ?? 0;
-  }
+    int wordLength = draggableWord!.length;
+    int row = startIndex ~/ boardSize;
+    int col = startIndex % boardSize;
 
-  if (mounted) {
-    setState(() {
-      for (int i = 0; i < wordLength; i++) {
-        int index = isHorizontal ? startIndex + i : startIndex + (i * boardSize);
-        boardTiles[index] = draggableWord![i];
+    // Verifica si las celdas están vacías
+    for (int i = 0; i < wordLength; i++) {
+      int index = isHorizontal ? startIndex + i : startIndex + (i * boardSize);
+      if (index >= boardSize * boardSize || boardTiles[index] != null) {
+        _showInvalidPlacementMessage();
+        return;
       }
-      // Sumar la puntuación al jugador o al bot según el turno
-      if (isPlayerTurn) {
-        playerScore += wordScore;
-      } else {
-        botScore += wordScore;
-      }
-      draggableWord = null;
-      _updatePlayerTiles();
-      _endTurn();
-    });
+    }
+
+    if (isHorizontal ? col + wordLength > boardSize : row + wordLength > boardSize) {
+      _showInvalidPlacementMessage();
+      return;
+    }
+
+    int wordScore = 0;
+    for (int i = 0; i < wordLength; i++) {
+      String letter = draggableWord![i];
+      wordScore += letterScores[letter] ?? 0;
+    }
+
+    if (mounted) {
+      setState(() {
+        for (int i = 0; i < wordLength; i++) {
+          int index = isHorizontal ? startIndex + i : startIndex + (i * boardSize);
+          boardTiles[index] = draggableWord![i];
+        }
+        // Suma la puntuación al jugador o al bot según el turno
+        if (isPlayerTurn) {
+          playerScore += wordScore;
+        } else {
+          botScore += wordScore;
+        }
+        draggableWord = null;
+        _updatePlayerTiles();
+        _endTurn();
+      });
+    }
+
+    // Verifica si alguien ha ganado
+    if (mounted && (playerScore >= 20 || botScore >= 20)) {
+      _showWinDialog();
+    }
   }
 
-  // Verificar si alguien ha ganado
-  if (mounted && (playerScore >= 20 || botScore >= 20)) {
-    _showWinDialog();
-  }
-}
-
+  // Muestra un diálogo cuando alguien gana
   void _showWinDialog() {
-  if (!mounted) return; // Ensure the widget is still mounted
+    if (!mounted) return; // Asegura que el widget esté montado
 
-  String winner = playerScore >= 20 ? 'Jugador' : 'Bot';
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('¡Felicidades!'),
-        content: Text('$winner ha ganado.'),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Volver a jugar'),
-            onPressed: () {
-              Navigator.of(context).pop();
-              if (mounted) {
-                _resetGame();
-              }
-            },
-          ),
-          TextButton(
-            child: const Text('Volver al dashboard'),
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop(); // Asume que el dashboard es la pantalla anterior
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
+    String winner = playerScore >= 20 ? 'Jugador' : 'Bot';
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('¡Felicidades!'),
+          content: Text('$winner ha ganado.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Volver a jugar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                if (mounted) {
+                  _resetGame();
+                }
+              },
+            ),
+            TextButton(
+              child: const Text('Volver al dashboard'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Asume que el dashboard es la pantalla anterior
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
+  // Reinicia el juego
   void _resetGame() {
     setState(() {
       playerScore = 0;
@@ -234,6 +247,7 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
+  // Finaliza el turno actual
   void _endTurn() {
     if (mounted) {
       setState(() {
@@ -246,63 +260,64 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  // Lógica para que el bot juegue
   void _botPlay() async {
-  await Future.delayed(const Duration(milliseconds: 500)); // Reducido a 500ms
+    await Future.delayed(const Duration(milliseconds: 500)); // Reducido a 500ms
 
-  String? word = await _getRandomWord();
+    String? word = await _getRandomWord();
 
-  if (word == null) {
-    if (mounted) {
+    if (word == null) {
+      if (mounted) {
+        setState(() {
+          _endTurn(); // Si no encuentra una palabra válida, pasa el turno
+        });
+      }
+      return;
+    }
+
+    // Busca un lugar aleatorio en el tablero
+    List<int> availablePositions = [];
+    for (int i = 0; i < boardSize * boardSize; i++) {
+      if (boardTiles[i] == null) {
+        availablePositions.add(i);
+      }
+    }
+
+    if (availablePositions.isEmpty) {
+      if (mounted) {
+        setState(() {
+          _endTurn(); // Si no hay espacio, pasa el turno
+        });
+      }
+      return;
+    }
+
+    // Elige una posición aleatoria
+    int randomPosition = availablePositions[Random().nextInt(availablePositions.length)];
+
+    // Verifica si la palabra cabe en la posición seleccionada
+    bool canPlaceWord = true;
+    for (int i = 0; i < word.length; i++) {
+      int index = isHorizontal ? randomPosition + i : randomPosition + (i * boardSize);
+      if (index >= boardSize * boardSize || boardTiles[index] != null) {
+        canPlaceWord = false;
+        break;
+      }
+    }
+
+    if (canPlaceWord && mounted) {
       setState(() {
-        _endTurn(); // Si no encuentra una palabra válida, pasa el turno
+        draggableWord = word;
+        _placeWordOnBoard(randomPosition);
+      });
+    } else if (mounted) {
+      setState(() {
+        _endTurn(); // Si no puede colocar la palabra, pasa el turno
       });
     }
-    return;
   }
 
-  // Buscar un lugar aleatorio en el tablero
-  List<int> availablePositions = [];
-  for (int i = 0; i < boardSize * boardSize; i++) {
-    if (boardTiles[i] == null) {
-      availablePositions.add(i);
-    }
-  }
-
-  if (availablePositions.isEmpty) {
-    if (mounted) {
-      setState(() {
-        _endTurn(); // Si no hay espacio, pasa el turno
-      });
-    }
-    return;
-  }
-
-  // Elegir una posición aleatoria
-  int randomPosition = availablePositions[Random().nextInt(availablePositions.length)];
-
-  // Verificar si la palabra cabe en la posición seleccionada
-  bool canPlaceWord = true;
-  for (int i = 0; i < word.length; i++) {
-    int index = isHorizontal ? randomPosition + i : randomPosition + (i * boardSize);
-    if (index >= boardSize * boardSize || boardTiles[index] != null) {
-      canPlaceWord = false;
-      break;
-    }
-  }
-
-  if (canPlaceWord && mounted) {
-    print("Colocando palabra '$word' en la posición $randomPosition");
-    setState(() {
-      draggableWord = word;
-      _placeWordOnBoard(randomPosition);
-    });
-  } else if (mounted) {
-    setState(() {
-      _endTurn(); // Si no puede colocar la palabra, pasa el turno
-    });
-  }
-}
-
+  // Descarta las fichas seleccionadas
   void _discardSelectedTiles() {
     if (selectedTilesForWord.isNotEmpty && playerDiscardsRemaining > 0 && mounted) {
       setState(() {
@@ -319,6 +334,7 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  // Devuelve las fichas seleccionadas al jugador
   void _returnTilesToPlayer() {
     if (mounted) {
       setState(() {
@@ -328,6 +344,7 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  // Muestra un mensaje de error
   void _showErrorMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -337,6 +354,7 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
+  // Muestra un mensaje de palabra inválida
   void _showInvalidWordMessage(String word) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -346,6 +364,7 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
+  // Muestra un mensaje de colocación inválida
   void _showInvalidPlacementMessage() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -355,6 +374,7 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
+  // Actualiza las fichas del jugador después de colocar una palabra
   void _updatePlayerTiles() {
     if (mounted) {
       setState(() {
@@ -365,6 +385,7 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  // Selecciona una palabra en el tablero
   void _selectWordOnBoard(int startIndex) {
     if (!isPlayerTurn) return;
     int row = startIndex ~/ boardSize;
@@ -392,6 +413,7 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  // Obtiene una palabra en una dirección específica (horizontal o vertical)
   String _getWordInDirection(int row, int col, int rowIncrement, int colIncrement) {
     String word = '';
 
@@ -412,6 +434,7 @@ class _GameScreenState extends State<GameScreen> {
     return word;
   }
 
+  // Extiende una palabra en el tablero
   Future<void> _extendWordOnBoard({bool extendForward = true}) async {
     if (selectedBoardWord == null || selectedBoardWordStartIndex == null || selectedTilesForWord.isEmpty) {
       _showErrorMessage('Selecciona una palabra y letras para extender.');
@@ -459,7 +482,7 @@ class _GameScreenState extends State<GameScreen> {
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
         toolbarHeight: 100,
-        backgroundColor: Color(0xFFF65259),
+        backgroundColor: const Color(0xFFF65259),
         automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -536,6 +559,7 @@ class _GameScreenState extends State<GameScreen> {
                   return GestureDetector(
                     onTap: () => _selectWordOnBoard(index),
                     child: DragTarget<String>(
+                      // ignore: deprecated_member_use
                       onAccept: (data) => _placeWordOnBoard(index),
                       builder: (context, candidateData, rejectedData) {
                         return Container(

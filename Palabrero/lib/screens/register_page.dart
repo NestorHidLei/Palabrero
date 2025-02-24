@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart'; // Para formatear fechas
+import 'package:firebase_auth/firebase_auth.dart'; // Para autenticación de usuarios
+import 'package:cloud_firestore/cloud_firestore.dart'; // Para almacenamiento de datos en Firestore
 import 'login_page.dart'; // Asegúrate de importar la página de login
 
+// Definición de la pantalla de registro como un StatefulWidget
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
@@ -12,28 +13,31 @@ class RegisterPage extends StatefulWidget {
   _RegisterPageState createState() => _RegisterPageState();
 }
 
+// Estado de la pantalla de registro
 class _RegisterPageState extends State<RegisterPage> {
+  // Controladores para los campos del formulario
   final _emailController = TextEditingController();
   final _dobController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  // Clave global para el formulario (para validaciones)
   final _formKey = GlobalKey<FormState>();
 
-  // Función para registrar el usuario y guardar datos en Firebase
+  // Función para registrar el usuario y guardar sus datos en Firebase
   Future<void> _registerUser() async {
     try {
-      // Registrar al usuario en Firebase Authentication
+      // Registrar usuario en Firebase Authentication
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      // Obtener el UID del usuario registrado
+      // Obtener UID del usuario recién registrado
       String uid = userCredential.user!.uid;
 
-      // Guardar los datos del usuario en Firestore
+      // Guardar datos del usuario en Firestore
       await FirebaseFirestore.instance.collection('Client').doc(uid).set({
         'email': _emailController.text.trim(),
         'username': _usernameController.text.trim(),
@@ -47,11 +51,11 @@ class _RegisterPageState extends State<RegisterPage> {
         const SnackBar(content: Text('Usuario registrado exitosamente')),
       );
 
-      // Redirigir al usuario a la pantalla principal o login
+      // Redirigir al usuario a la pantalla de inicio de sesión
       // ignore: use_build_context_synchronously
       Navigator.pop(context);
     } catch (e) {
-      // Manejar errores y mostrar mensaje
+      // Mostrar mensaje de error en caso de fallo
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al registrar: $e')),
@@ -63,12 +67,12 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: const Color(0xFFF65259),
+        color: const Color(0xFFF65259), // Fondo de la pantalla
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Header Section
+              // Encabezado
               Container(
                 padding: const EdgeInsets.only(top: 120.0),
                 child: const Column(
@@ -88,7 +92,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
               const SizedBox(height: 75.0),
 
-              // Register Form
+              // Formulario de registro
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: Form(
@@ -96,7 +100,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Email Field
+                      // Campo de Email
                       const Text(
                         'EMAIL',
                         style: TextStyle(
@@ -133,7 +137,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                       const SizedBox(height: 20.0),
 
-                      // Date of Birth Field
+                      // Campo de Fecha de Nacimiento
                       const Text(
                         'FECHA DE NACIMIENTO',
                         style: TextStyle(
@@ -160,6 +164,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         readOnly: true,
                         onTap: () async {
+                          // Mostrar selector de fecha
                           DateTime? pickedDate = await showDatePicker(
                             context: context,
                             initialDate: DateTime.now(),
@@ -177,7 +182,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                       const SizedBox(height: 20.0),
 
-                      // Username Field
+                      // Campo de Usuario
                       const Text(
                         'USUARIO',
                         style: TextStyle(
@@ -211,7 +216,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                       const SizedBox(height: 20.0),
 
-                      // Password Field
+                      // Campo de Contraseña
                       const Text(
                         'CONTRASEÑA',
                         style: TextStyle(
@@ -241,7 +246,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                       const SizedBox(height: 40.0),
 
-                      // Register Button
+                      // Botón de Registro
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -250,21 +255,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               _registerUser();
                             }
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(255, 187, 186, 186),
-                            padding: const EdgeInsets.symmetric(vertical: 15.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                          ),
-                          child: const Text(
-                            'CREAR CUENTA',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 39, 39, 39),
-                            ),
-                          ),
+                          child: const Text('CREAR CUENTA'),
                         ),
                       ),
 
@@ -279,18 +270,9 @@ class _RegisterPageState extends State<RegisterPage> {
                               MaterialPageRoute(builder: (context) => const LoginPage()),
                             );
                           },
-                          child: const Text(
-                            '¿Ya tienes una cuenta? Inicia sesión',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
+                          child: const Text('¿Ya tienes una cuenta? Inicia sesión'),
                         ),
                       ),
-
-                      const SizedBox(height: 110.0),
                     ],
                   ),
                 ),
