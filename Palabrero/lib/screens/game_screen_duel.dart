@@ -3,6 +3,7 @@ import 'dart:convert'; // Para manejar JSON
 import 'dart:math'; // Para operaciones matemáticas como generar números aleatorios
 import 'package:flutter/material.dart'; // Para la interfaz de usuario de Flutter
 import 'package:http/http.dart' as http; // Para realizar peticiones HTTP
+import 'package:Palabraro/exports.dart'; // Importa todas las dependencias desde un solo archivo
 
 // Clase principal que representa la pantalla del juego en modo duelo
 class GameScreenDuel extends StatefulWidget {

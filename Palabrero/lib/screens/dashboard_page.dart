@@ -1,9 +1,4 @@
-import 'package:Palabraro/screens/game_screen.dart'; // Importa la pantalla del juego en modo solo
-import 'package:Palabraro/screens/game_screen_duel.dart'; // Importa la pantalla del juego en modo duelo
-import 'package:Palabraro/screens/login_page.dart'; // Importa la pantalla de inicio de sesión
-import 'package:firebase_auth/firebase_auth.dart'; // Importa Firebase Authentication para manejar la sesión del usuario
-import 'package:flutter/foundation.dart'; // Proporciona herramientas de depuración
-import 'package:flutter/material.dart'; // Importa el framework UI de Flutter
+import 'package:Palabraro/exports.dart'; // Importa todas las dependencias desde un solo archivo
 
 /// Página principal del Dashboard
 class DashboardPage extends StatelessWidget {
@@ -33,6 +28,50 @@ class DashboardPage extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser; // Obtiene el usuario actual autenticado
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Dashboard'),
+        // Eliminamos el IconButton que abre el Drawer
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Créditos',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              title: const Text('Desarrollador: Néstor'),
+              onTap: () {
+                // Cierra el Drawer
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Diseñador: Néstor'),
+              onTap: () {
+                // Cierra el Drawer
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Versión: 1.0.0'),
+              onTap: () {
+                // Cierra el Drawer
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(

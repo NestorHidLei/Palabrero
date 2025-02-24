@@ -1,7 +1,6 @@
-import 'package:Palabraro/screens/dashboard_page.dart'; // Importa la pantalla de dashboard
+import 'package:Palabraro/exports.dart'; // Importa todas las dependencias desde un solo archivo
 import 'package:Palabraro/screens/register_page.dart'; // Importa la pantalla de registro
-import 'package:firebase_auth/firebase_auth.dart'; // Importa Firebase Authentication
-import 'package:flutter/material.dart'; // Importa Flutter para UI
+import 'package:Palabraro/screens/dashboard_page.dart'; // Importa la pantalla principal
 import 'package:google_sign_in/google_sign_in.dart'; // Importa Google Sign-In
 
 // Definición de la clase LoginPage como StatefulWidget

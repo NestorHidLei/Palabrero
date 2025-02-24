@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // Para formatear fechas
-import 'package:firebase_auth/firebase_auth.dart'; // Para autenticación de usuarios
 import 'package:cloud_firestore/cloud_firestore.dart'; // Para almacenamiento de datos en Firestore
-import 'login_page.dart'; // Asegúrate de importar la página de login
+import 'package:Palabraro/exports.dart'; // Importa todas las dependencias desde un solo archivo
 
 // Definición de la pantalla de registro como un StatefulWidget
 class RegisterPage extends StatefulWidget {
@@ -273,6 +271,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           child: const Text('¿Ya tienes una cuenta? Inicia sesión'),
                         ),
                       ),
+                      const SizedBox(height: 120.0),
                     ],
                   ),
                 ),
